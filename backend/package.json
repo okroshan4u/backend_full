@@ -1,0 +1,16 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "this is the full stack project of backend",
+  "keywords": [
+    "js",
+    "backend"
+  ],
+  "license": "ISC",
+  "author": "okroshan4u",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm start test"
+  }
+}
