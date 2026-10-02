@@ -1,1 +1,1 @@
-// here we will write contants 
+// here we will write contants requirerd for the app
