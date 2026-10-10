@@ -45,7 +45,6 @@ connectDB()
 //     console.error("MongoDB connection failed:", err);
 //   });
 
-export default connectDB
 
 
 
