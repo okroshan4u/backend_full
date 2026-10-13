@@ -80,6 +80,41 @@ const registerUser = asyncHandler( async (req , res)=>{
 
 })
 
+
+const loginUser = asyncHandler(async (req, res)=>{
+    // req body -> data
+    // username or email
+    //find the user
+    //password check
+    //access and refresh token
+    // send cookie
+
+    const {email, username,password} = req.body;
+
+    if(!username || !email){
+        throw new ApiError(400, "email or username is required for login")
+    }
+
+    const user = await User.findOne({
+        $or:[{email},{username}]
+    })
+
+    if(!user){
+        throw new ApiError(404, "User does not exist")
+    }
+    // here User and user are different User is comming from mongoose which we made from mongoose model but 
+    // so User will have the methods of mongoose and will not have the method that we have created
+
+    // user this user will have all the method that we created for checking the user 
+    // password field etc
+    const isPasswordValid = await user.isPasswordCorrect(password)
+
+    if(!isPasswordValid){
+        throw new ApiError(401, "Invalid user credentials")
+    }
+})
+
 export {
-    registerUser
+    registerUser,
+    loginUser
 }
