@@ -140,7 +140,7 @@ const loginUser = asyncHandler(async (req, res)=>{
     // 1. update the user here 
     // 2. hit a new request to the database and get the refreshToken
     // now question is that if hitting the database is expesive then update the user here only 
-    // or if it is not then hit the database ( apply the method accordiglyy )
+    // or if it is not then hit the database ( apply the method accordigly )
 
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
