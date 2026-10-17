@@ -4,6 +4,27 @@ import {User} from "../models/user.models.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 
+
+const generateAccessAndRefreshToken = async(userId) =>{
+    try {
+        const user = await User.findById(userId)
+        const accessToken = user.generateAccessToken()
+        const refreshToken = user.generateRefreshToken()
+
+        user.refreshToken = refreshToken
+        // saving in user (basically in database so every thing which in model user that will get cicked in and hence require validation for that solution is below)
+
+        await user.save({validateBeforeSave: false})
+
+        return {accessToken, refreshToken}
+
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while generating the access token")
+    }
+}
+
+
+
 const registerUser = asyncHandler( async (req , res)=>{
     // get user details from backend
     // validation - not empty
@@ -112,6 +133,38 @@ const loginUser = asyncHandler(async (req, res)=>{
     if(!isPasswordValid){
         throw new ApiError(401, "Invalid user credentials")
     }
+    const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user._id)
+    // now here we have user which is comming from the line 119 so when we took the user 
+    // from that line our refreshToken is empty since we call the method at line 136
+    // hence we will have empty refreshToken so to get the refreshToken we have 2 options 
+    // 1. update the user here 
+    // 2. hit a new request to the database and get the refreshToken
+    // now question is that if hitting the database is expesive then update the user here only 
+    // or if it is not then hit the database ( apply the method accordiglyy )
+
+    const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
+
+        const options = {
+            httpOnly:true,
+            secure:true
+        }
+
+        return res
+        .status(200)
+        .cookie("accesToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    user:loggedInUser,accessToken,
+                    refreshToken
+                },
+                "User logged In Successfully"
+            )
+        )
+    
+
 })
 
 export {
